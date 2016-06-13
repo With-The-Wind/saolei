@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>扫雷</title>
+</head>
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	body,html{
+		height:100%;
+		width:100%;
+		position: relative;
+	}
+	#beijing{
+		width:30000px;
+		height:926px;
+		position: absolute;
+		margin: auto;
+		top:0;
+		left:0;
+		bottom:0;
+	}
+		.bjimg
+			{
+			width:100px;
+			height:100px;
+			background-image: url(qmsht.jpg);
+			animation:mymove 500s linear infinite;
+			-webkit-animation:mymove 500s linear infinite; /*Safari and Chrome*/
+			animation-direction:alternate;
+			}
+			@keyframes mymove
+			{
+				from {left:0;}
+				to {left:-28080px;}
+			}
+			@-webkit-keyframes mymove /*Safari and Chrome*/
+			{
+			from {left:-28080px;}
+			to {left:0;}
+			}
+	.head{
+		width: 600px;
+		height: 50px;
+		position: absolute;
+		margin: auto;
+		top:100px;
+		left:0;
+		right:0;
+		border:1px solid #ccc;
+		opacity: 1;
+	}
+	.time{
+		width: 100px;
+		height: 40px;
+		border:1px solid #ccc;
+		background: #ebb410;
+		margin-top: 4px;
+		float: left;
+		text-align: center;
+		line-height: 40px;
+		color:#fff;
+	}
+	.start{
+		width: 100px;
+		height: 40px;
+		border:1px solid #ccc;
+		background: #ebb410;
+		margin-top: 4px;
+		float: left;
+		margin-left: 150px;
+		text-align: center;
+		line-height: 40px;
+		color:#fff;
+	}
+	.leishu{
+		width: 100px;
+		height: 40px;
+		border:1px solid #ccc;
+		background: #ebb410;
+		margin-top: 4px;
+		float: right;
+		text-align: center;
+		line-height: 40px;
+		color:#fff;
+	}
+	.ul{
+		position: fixed;
+		margin: auto;
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		width: 600px;
+		height: 600px;
+		border-left:1px solid #947823;
+		border-top: 1px solid #947823;
+		opacity: 1;
+	}
+	.block{
+		width: 38px;
+		height:38px;
+		margin: 0 1px 1px 0;
+		background: rgba(190, 158, 23, 0.73);
+		border-right:1px solid #947823;
+		border-bottom: 1px solid #947823;
+		float:left;
+		text-align: center;
+		line-height: 39px;
+	}
+	.tip{
+		background: #fff;
+	}
+	.biaoji{
+		font-size: 24px;
+		color:red;
+	}
+	.biaoji::after{
+		content:'⚑';
+	}
+	.changjing{
+		position: fixed;
+		margin:auto;
+		top:0;
+		right:0;
+		left:0;
+		bottom:0;
+	}
+
+</style>
+<body>
+	<div id="beijing" class="bjimg"></div>
+		<div class="changjing">
+			<div class="head">
+				<div class="time">
+					0
+				</div>
+				<div class="start">
+				   开始游戏
+				</div>
+				<div class="leishu">
+
+				</div>
+			</div>
+			<ul class="ul">
+			</ul>
+		</div>
+<script src="../jquery工程文件/jquery-1.12.0.js"></script>
+<script>
+	//布雷
+    $('ul').on('contextmenu',false);
+    $('ul').on('click',false);
+    $('ul').off('mousedown');
+    var xy2id=function(a,b){
+        	return a +'-' +b
+        }
+    var jisuan=function(x,y){
+        var num = 0;
+        if($('#'+xy2id(x,y-1)).is('.lei')){num++};
+        if($('#'+xy2id(x,y+1)).is('.lei')){num++};
+        if($('#'+xy2id(x-1,y-1)).is('.lei')){num++};
+        if($('#'+xy2id(x-1,y)).is('.lei')){num++};
+        if($('#'+xy2id(x-1,y+1)).is('.lei')){num++};
+        if($('#'+xy2id(x+1,y-1)).is('.lei')){num++};
+        if($('#'+xy2id(x+1,y)).is('.lei')){num++};
+        if($('#'+xy2id(x+1,y+1)).is('.lei')){num++};
+        return num;
+    }
+    var zuojian=function(e){
+    	if($(this).is('.biaoji')){
+    		return;
+    	}
+         if(e.data.lei){
+         	alert('死');
+					$('.biaoji').removeClass();
+         	$('.lei').each(function(i,v){
+						$('.lei').eq(i).delay(13).css("background", "url(2.png) center center no-repeat");
+					})
+         	$('ul').off('mousedown');
+					clearInterval(t);
+         }else{
+         	$(this).text(jisuan(e.data.x,e.data.y)).addClass('tip');
+         }
+    }
+    var youjian=function(e){
+    	if($(this).is('.tip')){
+    		return;
+    	}
+         $(this).toggleClass('biaoji');
+         if($('.biaoji').length===$('.lei').length){
+         	if($('.lei.biaoji').length===$('.lei').length){
+         		alert('赢')
+         	}
+         }else if($('.biaoji').length>$('.lei').length){
+         	alert('有错误')
+         	$('ul').off('click')
+         }else{
+         	return;
+         }
+    }
+	var clickHandler=function(e){
+        if(e.which===1){
+           $.proxy(zuojian,this)(e);
+    	}else if(e.which===3){
+    	   $.proxy(youjian,this)(e);
+    	}else{
+    		return;
+    	}
+	}
+
+    var render=function(){
+    	for(var i = 0; i < 15; i++){
+	    	for(var j = 0; j < 15; j++){
+	    		var isLei=Math.random()>0.8;
+	    		$('.leishu').html($('.lei').length);
+	    		$('<li>').attr('id',i+'-'+j)
+	    		.addClass(function(){
+	               return 'block '+(isLei?'lei':'')
+	    		})
+	    		// .text(function(){
+	    		// 	return isLei?'lei':'';
+	    		// })
+	    		.on('mousedown',{x:i,y:j,lei:isLei},clickHandler)
+	    		.appendTo('ul');
+
+	    	}
+	    }
+    }
+    render()
+   //开始游戏
+   var t;
+	 var m=0;
+	 var zou = function (){
+			m+=1;
+	    $('.time').html(m);
+	}
+  $('.start').on('click',function(){
+    $('.start').html('重新开始');
+   	$('ul').empty();
+   	$('.time').html(0);
+   	render();
+   	m=0;
+   	clearInterval(t);
+   	t=setInterval(zou,1000);
+		return false;
+   })
+	setInterval(function(){
+		$('#beijing').animate({left:"-=1"},10);
+	},10)
+	$(".changjing").on("click",function(){
+		if($(this).hasClass('dl')){
+				console.log(m)
+				$(".time").html(m);
+				$(this).removeClass('dl')
+				$(".ul").animate({opacity:1},300);
+				$(".head").animate({opacity:1},300);
+				t = setInterval(zou,1000);
+		}else{
+			$(this).addClass('dl');
+			$(".ul").animate({opacity:0},300);
+			$(".head").animate({opacity:0},300);
+			clearInterval(t);
+		}
+	})
+</script>
+</body>
+</html>
